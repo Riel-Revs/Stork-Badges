@@ -1,0 +1,880 @@
+                    <div class="form-group">
+                        <label for="communityUrl">Community URL</label>
+                        <input type="<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StorkOracle - Enhanced ID Badge Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --navy: #001F3F;
+            --teal: #20B2AA;
+            --white: #FFFFFF;
+            --muted: #8B9CAF;
+            --card-w: 560px;
+            --card-h: 320px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--navy) 0%, #0A1322 100%);
+            color: var(--white);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--teal);
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 10px rgba(32, 178, 170, 0.3);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .form-panel {
+            background: rgba(15, 27, 46, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(32, 178, 170, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--teal);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(32, 178, 170, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 31, 63, 0.5);
+            color: var(--white);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .role-preview {
+            margin-top: 0.5rem;
+            padding: 8px 12px;
+            background: rgba(32, 178, 170, 0.1);
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--teal);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, var(--teal), #4ECDC4);
+            color: var(--white);
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(32, 178, 170, 0.3);
+        }
+
+        .btn-download {
+            background: transparent;
+            color: var(--teal);
+            border: 2px solid var(--teal);
+        }
+
+        .btn-download:hover {
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .badge-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .card-scene {
+            width: var(--card-w);
+            height: var(--card-h);
+            perspective: 1200px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+        }
+
+        .card-info {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .flip-hint {
+            background: rgba(32, 178, 170, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--teal);
+            margin: 0 8px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .card-scene {
+                transform: scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>StorkOracle Badge Generator</h1>
+        
+        <div class="main-content">
+            <!-- Form Panel -->
+            <div class="form-panel">
+                <form id="badgeForm">
+                    <div class="form-group">
+                        <label for="handle">Handle</label>
+                        <input type="text" id="handle" placeholder="@Riel_Revs" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nickname">Nickname</label>
+                        <input type="text" id="nickname" placeholder="A.k.a The Oracle">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <select id="role" required>
+                            <option value="Winged">Winged</option>
+                            <option value="Peep">Peep</option>
+                            <option value="Songbird">Songbird</option>
+                            <option value="Wayfinder">Wayfinder</option>
+                            <option value="Mod">Mod</option>
+                            <option value="Skymaster">Skymaster</option>
+                        </select>
+                        <div class="role-preview" id="rolePreview">🪽 Winged</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="communityUrl">Community URL</label>
+                        <input type="url" id="communityUrl" placeholder="https://your-community.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profilePic">Profile Picture</label>
+                        <input type="file" id="profilePic" accept="image/*">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imageUrl">Or Image URL</label>
+                        <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg">
+                    </div>
+
+                    <div class="buttons">
+                        <button type="button" id="generateBtn" class="btn-generate">Generate</button>
+                        <button type="button" id="downloadBtn" class="btn-download">Download</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Badge Display -->
+            <div class="badge-display">
+                <div class="card-scene" id="cardScene">
+                    <div class="card" id="card">
+                        <div class="card-side card-front">
+                            <canvas id="frontCanvas" width="560" height="320"></canvas>
+                        </div>
+                        <div class="card-side card-back">
+                            <canvas id="backCanvas" width="560" height="320"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-info">
+                    <span class="flip-hint">Click to flip</span>
+                    Front: Profile & details • Back: Handle & QR code
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CARD_W = 560;
+        const CARD_H = 320;
+        const DPR = window.devicePixelRatio || 1;
+
+        // Colors
+        const NAVY = '#001F3F';
+        const TEAL = '#20B2AA';
+        const WHITE = '#FFFFFF';
+        const MUTED = '#8B9CAF';
+
+        // Role system - will be updated with your custom emojis/icons
+        const ROLES = {
+            'Winged': { emoji: '🪽', color: '#4A90E2' },
+            'Peep': { emoji: '🐣', color: '#F5A623' },
+            'Songbird': { emoji: '🎵', color: '#7ED321' },
+            'Wayfinder': { emoji: '🧭', color: '#9013FE' },
+            'Mod': { emoji: '🛡️', color: '#D0021B' },
+            'Skymaster': { emoji: '⭐', color: '#FFD700' }
+        };
+
+        // Community URL for QR code
+        const COMMUNITY_URL = 'https://www.stork.network/';
+
+        // DOM elements
+        const form = document.getElementById('badgeForm');
+        const handleInput = document.getElementById('handle');
+        const nicknameInput = document.getElementById('nickname');
+        const roleSelect = document.getElementById('role');
+        const profilePicInput = document.getElementById('profilePic');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const rolePreview = document.getElementById('rolePreview');
+        const cardScene = document.getElementById('cardScene');
+        const card = document.getElementById('card');
+        const frontCanvas = document.getElementById('frontCanvas');
+        const backCanvas = document.getElementById('backCanvas');
+
+        // Setup canvases
+        function setupCanvas(canvas) {
+            canvas.width = CARD_W * DPR;
+            canvas.height = CARD_H * DPR;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(DPR, DPR);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            return ctx;
+        }
+
+        const frontCtx = setupCanvas(frontCanvas);
+        const backCtx = setupCanvas(backCanvas);
+
+        // Utility functions
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.arcTo(x + width, y, x + width, y + height, radius);
+            ctx.arcTo(x + width, y + height, x, y + height, radius);
+            ctx.arcTo(x, y + height, x, y, radius);
+            ctx.arcTo(x, y, x + width, y, radius);
+            ctx.closePath();
+        }
+
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                if (!src) return reject(new Error('No source'));
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+
+        function generateQR(text) {
+            return new Promise((resolve, reject) => {
+                const canvas = document.createElement('canvas');
+                QRCode.toCanvas(canvas, text, {
+                    width: 120,
+                    margin: 2,
+                    color: {
+                        dark: WHITE,
+                        light: NAVY
+                    }
+                }, (error) => {
+                    if (error) reject(error);
+                    else resolve(canvas);
+                });
+            });
+        }
+
+        // Enhanced brand logo drawing (placeholder - you'll provide the actual design)
+        function drawBrandLogo(ctx, x, y, size) {
+            // Sophisticated Stork Network logo placeholder
+            const gradient = ctx.createRadialGradient(x + size/2, y + size/2, 0, x + size/2, y + size/2, size/2);
+            gradient.addColorStop(0, TEAL);
+            gradient.addColorStop(0.6, '#1A9B94');
+            gradient.addColorStop(1, '#0F6B6B');
+            
+            // Outer circle
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x + size/2, y + size/2, size/2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Inner design - stylized stork
+            ctx.strokeStyle = WHITE;
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // Stork silhouette (simplified)
+            const centerX = x + size/2;
+            const centerY = y + size/2;
+            
+            ctx.beginPath();
+            // Body
+            ctx.moveTo(centerX - 8, centerY + 2);
+            ctx.lineTo(centerX + 6, centerY - 4);
+            // Neck and head
+            ctx.moveTo(centerX + 6, centerY - 4);
+            ctx.lineTo(centerX + 10, centerY - 8);
+            // Beak
+            ctx.moveTo(centerX + 10, centerY - 8);
+            ctx.lineTo(centerX + 14, centerY - 6);
+            // Wing
+            ctx.moveTo(centerX, centerY - 2);
+            ctx.lineTo(centerX - 4, centerY - 6);
+            ctx.lineTo(centerX + 2, centerY - 8);
+            // Legs
+            ctx.moveTo(centerX - 2, centerY + 2);
+            ctx.lineTo(centerX - 4, centerY + 8);
+            ctx.moveTo(centerX + 2, centerY + 2);
+            ctx.lineTo(centerX, centerY + 8);
+            ctx.stroke();
+            
+            // Border
+            ctx.strokeStyle = WHITE;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(x + size/2, y + size/2, size/2 - 1, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // Enhanced watermark with brand logo
+        function drawWatermark(ctx) {
+            ctx.save();
+            ctx.globalAlpha = 0.06;
+            // Draw large version of brand logo as watermark
+            drawBrandLogo(ctx, CARD_W/2 - 40, CARD_H/2 - 40, 80);
+            ctx.restore();
+        }
+
+        // Enhanced "Powered by Stork" at bottom-right
+        function drawPoweredBy(ctx) {
+            const logoSize = 24;
+            const x = CARD_W - 120;
+            const y = CARD_H - 40;
+
+            // Brand logo
+            drawBrandLogo(ctx, x, y, logoSize);
+
+            // Text
+            ctx.textAlign = 'left';
+            ctx.fillStyle = MUTED;
+            ctx.font = '9px Inter';
+            ctx.fillText('Powered by', x + logoSize + 6, y + 6);
+            
+            ctx.fillStyle = TEAL;
+            ctx.font = 'bold 11px Inter';
+            ctx.fillText('Stork Network', x + logoSize + 6, y + 18);
+        }
+
+        // Enhanced neutral grey rope at top
+        function drawRope(ctx) {
+            const ropeY = 8;
+            const ropeHeight = 6;
+            const ropeWidth = CARD_W - 60;
+            const ropeX = 30;
+            
+            // Rope gradient
+            const ropeGradient = ctx.createLinearGradient(ropeX, ropeY, ropeX + ropeWidth, ropeY);
+            ropeGradient.addColorStop(0, 'rgba(180, 180, 180, 0.3)');
+            ropeGradient.addColorStop(0.5, 'rgba(200, 200, 200, 0.6)');
+            ropeGradient.addColorStop(1, 'rgba(180, 180, 180, 0.3)');
+            
+            // Rope texture effect
+            ctx.fillStyle = ropeGradient;
+            roundRect(ctx, ropeX, ropeY, ropeWidth, ropeHeight, ropeHeight/2);
+            ctx.fill();
+            
+            // Rope highlights for texture
+            ctx.strokeStyle = 'rgba(220, 220, 220, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(ropeX + 10, ropeY + 1);
+            ctx.lineTo(ropeX + ropeWidth - 10, ropeY + 1);
+            ctx.stroke();
+            
+            // Rope shadow
+            ctx.strokeStyle = 'rgba(140, 140, 140, 0.3)';
+            ctx.beginPath();
+            ctx.moveTo(ropeX + 10, ropeY + ropeHeight - 1);
+            ctx.lineTo(ropeX + ropeWidth - 10, ropeY + ropeHeight - 1);
+            ctx.stroke();
+        }
+
+        function drawAvatar(ctx, img, role, x, y, radius) {
+            const roleData = ROLES[role];
+            
+            // Enhanced teal gradient ring with role color accent
+            ctx.save();
+            ctx.shadowColor = roleData.color;
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetY = 4;
+
+            const gradient = ctx.createLinearGradient(x - radius - 8, y - radius - 8, x + radius + 8, y + radius + 8);
+            gradient.addColorStop(0, NAVY);
+            gradient.addColorStop(0.3, TEAL);
+            gradient.addColorStop(0.7, roleData.color);
+            gradient.addColorStop(1, NAVY);
+
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // Avatar image with enhanced styling
+            if (img) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.clip();
+
+                const scale = Math.max((radius * 2) / img.width, (radius * 2) / img.height);
+                const sw = (radius * 2) / scale;
+                const sh = (radius * 2) / scale;
+                const sx = (img.width - sw) / 2;
+                const sy = (img.height - sh) / 2;
+
+                ctx.drawImage(img, sx, sy, sw, sh, x - radius, y - radius, radius * 2, radius * 2);
+                ctx.restore();
+            } else {
+                // Enhanced placeholder with role color
+                const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+                gradient.addColorStop(0, roleData.color + '40');
+                gradient.addColorStop(0.7, NAVY);
+                gradient.addColorStop(1, '#000');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = WHITE;
+                ctx.font = 'bold 36px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('U', x, y);
+            }
+
+            // Enhanced role icon overlay with role color
+            const iconSize = 28;
+            const iconX = x + radius - 14;
+            const iconY = y + radius - 14;
+
+            // Icon background with role color
+            const iconGradient = ctx.createRadialGradient(iconX, iconY, 0, iconX, iconY, iconSize/2 + 4);
+            iconGradient.addColorStop(0, WHITE);
+            iconGradient.addColorStop(1, roleData.color + '20');
+
+            ctx.fillStyle = iconGradient;
+            ctx.beginPath();
+            ctx.arc(iconX, iconY, iconSize/2 + 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = roleData.color;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Role emoji with enhanced styling
+            ctx.font = `${iconSize}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(roleData.emoji, iconX, iconY);
+        }
+
+        function drawFrontBadge(data) {
+            const ctx = frontCtx;
+            ctx.clearRect(0, 0, CARD_W, CARD_H);
+
+            // Enhanced background with subtle pattern
+            const bgGradient = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
+            bgGradient.addColorStop(0, NAVY);
+            bgGradient.addColorStop(0.5, '#001426');
+            bgGradient.addColorStop(1, '#000B1A');
+
+            roundRect(ctx, 0, 0, CARD_W, CARD_H, 18);
+            ctx.fillStyle = bgGradient;
+            ctx.fill();
+
+            // Elegant border with gradient
+            const borderGradient = ctx.createLinearGradient(0, 0, CARD_W, 0);
+            borderGradient.addColorStop(0, TEAL + '60');
+            borderGradient.addColorStop(0.5, TEAL);
+            borderGradient.addColorStop(1, TEAL + '60');
+            
+            ctx.strokeStyle = borderGradient;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Neutral grey rope at top
+            drawRope(ctx);
+
+            // Subtle corner accents
+            ctx.fillStyle = TEAL + '20';
+            ctx.fillRect(0, 0, 40, 2);
+            ctx.fillRect(CARD_W - 40, 0, 40, 2);
+            ctx.fillRect(0, CARD_H - 2, 40, 2);
+            ctx.fillRect(CARD_W - 40, CARD_H - 2, 40, 2);
+
+            // Watermark and branding
+            drawWatermark(ctx);
+            drawPoweredBy(ctx);
+
+            // Avatar with enhanced positioning
+            const avatarX = 140;
+            const avatarY = CARD_H / 2 + 5;
+            const avatarR = 72;
+
+            drawAvatar(ctx, data.profileImage, data.role, avatarX, avatarY, avatarR);
+
+            // Enhanced text section with better typography
+            const textX = 250;
+            let textY = 88;
+
+            // Username with text shadow
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetY = 2;
+            ctx.fillStyle = WHITE;
+            ctx.font = 'bold 30px Inter';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillText(data.username, textX, textY);
+            ctx.restore();
+
+            // Role with enhanced styling and role color
+            textY += 40;
+            const roleData = ROLES[data.role];
+            
+            // Role background
+            ctx.fillStyle = roleData.color + '20';
+            roundRect(ctx, textX - 4, textY - 20, 160, 28, 6);
+            ctx.fill();
+            
+            ctx.fillStyle = roleData.color;
+            ctx.font = '700 19px Inter';
+            ctx.fillText(`${roleData.emoji} ${data.role}`, textX, textY);
+
+            // Nickname with subtle styling
+            if (data.nickname) {
+                textY += 35;
+                ctx.fillStyle = WHITE + 'E0';
+                ctx.font = '500 17px Inter';
+                ctx.fillText(`A.k.a ${data.nickname}`, textX, textY);
+            }
+
+            // Decorative line
+            ctx.strokeStyle = TEAL + '40';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(textX, textY + 20);
+            ctx.lineTo(textX + 120, textY + 20);
+            ctx.stroke();
+        }
+
+        function drawBackBadge(data) {
+            const ctx = backCtx;
+            ctx.clearRect(0, 0, CARD_W, CARD_H);
+
+            // Enhanced background (same as front)
+            const bgGradient = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
+            bgGradient.addColorStop(0, NAVY);
+            bgGradient.addColorStop(0.5, '#001426');
+            bgGradient.addColorStop(1, '#000B1A');
+
+            roundRect(ctx, 0, 0, CARD_W, CARD_H, 18);
+            ctx.fillStyle = bgGradient;
+            ctx.fill();
+
+            // Border
+            const borderGradient = ctx.createLinearGradient(0, 0, CARD_W, 0);
+            borderGradient.addColorStop(0, TEAL + '60');
+            borderGradient.addColorStop(0.5, TEAL);
+            borderGradient.addColorStop(1, TEAL + '60');
+            
+            ctx.strokeStyle = borderGradient;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Neutral grey rope at top
+            drawRope(ctx);
+
+            // Corner accents
+            ctx.fillStyle = TEAL + '20';
+            ctx.fillRect(0, 0, 40, 2);
+            ctx.fillRect(CARD_W - 40, 0, 40, 2);
+            ctx.fillRect(0, CARD_H - 2, 40, 2);
+            ctx.fillRect(CARD_W - 40, CARD_H - 2, 40, 2);
+
+            // Watermark and branding
+            drawWatermark(ctx);
+            drawPoweredBy(ctx);
+
+            // Top section with enhanced styling
+            let topY = 65;
+            
+            // Handle with shadow
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 3;
+            ctx.shadowOffsetY = 1;
+            ctx.fillStyle = WHITE;
+            ctx.font = '700 20px Inter';
+            ctx.textAlign = 'left';
+            ctx.fillText(data.handle, 35, topY);
+            ctx.restore();
+
+            // Role with enhanced styling
+            topY += 32;
+            const roleData = ROLES[data.role];
+            
+            // Role background
+            ctx.fillStyle = roleData.color + '25';
+            roundRect(ctx, 31, topY - 18, 140, 24, 5);
+            ctx.fill();
+            
+            ctx.fillStyle = roleData.color;
+            ctx.font = '600 16px Inter';
+            ctx.fillText(`${roleData.emoji} ${data.role}`, 35, topY);
+
+            // Enhanced QR Code section
+            if (data.qrCode) {
+                const qrSize = 130;
+                const qrX = (CARD_W - qrSize) / 2;
+                const qrY = (CARD_H - qrSize) / 2 + 15;
+
+                // QR background with gradient
+                const qrBgGradient = ctx.createLinearGradient(qrX - 10, qrY - 10, qrX + qrSize + 10, qrY + qrSize + 10);
+                qrBgGradient.addColorStop(0, WHITE);
+                qrBgGradient.addColorStop(1, '#F8F9FA');
+
+                ctx.fillStyle = qrBgGradient;
+                roundRect(ctx, qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 12);
+                ctx.fill();
+
+                // QR border
+                ctx.strokeStyle = TEAL + '40';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // QR shadow
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetY = 4;
+                ctx.drawImage(data.qrCode, qrX, qrY, qrSize, qrSize);
+                ctx.restore();
+
+                // QR label
+                ctx.fillStyle = MUTED;
+                ctx.font = '500 11px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('stork.network', CARD_W / 2, qrY + qrSize + 25);
+            }
+
+            // Decorative elements
+            ctx.strokeStyle = TEAL + '30';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(35, topY + 15);
+            ctx.lineTo(120, topY + 15);
+            ctx.stroke();
+        }
+
+        // Event handlers
+        roleSelect.addEventListener('change', () => {
+            const role = roleSelect.value;
+            const roleData = ROLES[role];
+            rolePreview.textContent = `${roleData.emoji} ${role}`;
+        });
+
+        cardScene.addEventListener('click', () => {
+            card.classList.toggle('flipped');
+        });
+
+        generateBtn.addEventListener('click', async () => {
+            const handle = handleInput.value.trim();
+            if (!handle) {
+                alert('Please enter a handle');
+                return;
+            }
+
+            const formattedHandle = handle.startsWith('@') ? handle : '@' + handle;
+            const username = formattedHandle.replace('@', '');
+
+            const data = {
+                handle: formattedHandle,
+                username: username,
+                nickname: nicknameInput.value.trim(),
+                role: roleSelect.value,
+                profileImage: null,
+                qrCode: null
+            };
+
+            // Generate QR code
+            try {
+                data.qrCode = await generateQR(COMMUNITY_URL);
+            } catch (e) {
+                console.warn('QR generation failed:', e);
+            }
+
+            // Load profile image
+            const file = profilePicInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        data.profileImage = await loadImage(e.target.result);
+                    } catch (err) {
+                        console.warn('Failed to load profile image:', err);
+                    }
+                    drawFrontBadge(data);
+                    drawBackBadge(data);
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            // Try URL if provided
+            const url = imageUrlInput.value.trim();
+            if (url) {
+                try {
+                    data.profileImage = await loadImage(url);
+                } catch (e) {
+                    console.warn('Could not load image from URL:', e);
+                }
+            }
+
+            drawFrontBadge(data);
+            drawBackBadge(data);
+        });
+
+        downloadBtn.addEventListener('click', async () => {
+            try {
+                const canvas = await html2canvas(cardScene, {
+                    backgroundColor: null,
+                    scale: 2,
+                    useCORS: true
+                });
+
+                const link = document.createElement('a');
+                link.download = 'stork-badge.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.warn('Download failed:', error);
+                alert('Download failed. Please try again.');
+            }
+        });
+
+        // Auto-generate on load
+        setTimeout(() => {
+            if (!handleInput.value) {
+                handleInput.value = '@YourHandle';
+            }
+            generateBtn.click();
+        }, 500);
+    </script>
+</body>
+</html>
